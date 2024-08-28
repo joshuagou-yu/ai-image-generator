@@ -1,45 +1,57 @@
-"use client";
+import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 
-import { Card } from "@nextui-org/react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-
-export default function PictureList({ pictures }: { pictures: any }) {
-  const router = useRouter();
-  const handlePictureClick = (picture: any) => {
-    router.push(`/picture/${picture.id}`);
-  };
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-6xl font-bold mb-4 text-center pb-10">Gallery</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {pictures.map((picture: any, index: number) => (
-          <Card key={index} className="p-4">
-            <Image
-              key={picture.id}
-              src={picture.url}
-              alt={picture.prompt}
-              width={300}
-              height={300}
-              objectFit="cover"
-              layout="responsive"
-              onClick={() => handlePictureClick(picture)}
-            />
-            <div className="mt-2 pb-2">
-              {picture.tags.map((tag: string, i: number) => (
-                <span key={i} className="mr-2 px-2 py-1 bg-orange-200 dark:bg-orange-400 rounded text-gray-500">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <p className="text-sm text-gray-500">
-              {new Date(picture.createdAt).toLocaleDateString()}
-            </p>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
+interface Picture {
+  id: string
+  url: string
+  prompt: string
+  username: string
+  created_at: string
 }
 
+interface PictureListProps {
+  pictures: Picture[]
+}
+
+const PictureList: React.FC<PictureListProps> = ({ pictures }) => {
+  console.log('Pictures in PictureList:', pictures) // 添加这行来确认数据
+
+  if (!pictures || pictures.length === 0) {
+    return <div>No pictures found.</div>
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {pictures.map((picture) => (
+        <Link href={`/picture/${picture.id}`} key={picture.id}>
+          <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div className="relative h-48">
+              {picture.url ? (
+                <Image
+                  src={picture.url}
+                  alt={picture.prompt || 'No prompt available'}
+                  layout="fill"
+                  objectFit="cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  No image available
+                </div>
+              )}
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-gray-600 mb-2">By {picture.username || 'Unknown'}</p>
+              <p className="text-gray-800 font-semibold truncate">{picture.prompt || 'No prompt available'}</p>
+              <p className="text-xs text-gray-500 mt-2">
+                {picture.created_at ? new Date(picture.created_at).toLocaleDateString() : 'Date unknown'}
+              </p>
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  )
+}
+
+export default PictureList

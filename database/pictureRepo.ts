@@ -56,4 +56,3 @@ export async function deletePicture(id: string) {
     .where("id", "=", id)
     .execute();
 }
-
